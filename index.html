@@ -690,6 +690,24 @@ function getQBadge(rank,total){const p=rank/total;if(IS_NEW.has(ADV[rank]))retur
 function showToast(msg){const t=document.getElementById("toast");t.textContent=msg;t.classList.add("on");setTimeout(()=>t.classList.remove("on"),6000);}
 function showMsg(id,txt,ok){const el=document.getElementById(id);if(!el)return;el.innerHTML='<div class="msg '+( ok?"mok":"merr")+'">'+txt+'</div>';setTimeout(()=>{if(el)el.innerHTML="";},3000);}
 
+function speak(text){
+  try{
+    window.speechSynthesis.cancel();
+    var u=new SpeechSynthesisUtterance(text);
+    u.lang="es-MX";u.rate=1.0;u.pitch=1.25;u.volume=0.85;
+    var voices=window.speechSynthesis.getVoices();
+    var vx=voices.find(function(v){return v.lang==="es-MX";})||voices.find(function(v){return v.lang.startsWith("es");});
+    if(vx)u.voice=vx;
+    window.speechSynthesis.speak(u);
+  }catch(ex){}
+}
+function getSaleMsg(name,plan,tipo){
+  var first=name.split(" ")[0];
+  if(tipo==="migracion")return "Atencion "+first+", esa fue una migracion. Media venta menos para la comision.";
+  if(plan==="$44.990")return "Cuidado "+first+", ese plan es muy barato. La proxima apunta mas alto.";
+  if(plan==="$64.990")return "Asi se hace "+first+"! Esa es la venta que mas cuenta. Sigue adelante.";
+  return "Bien hecho "+first+", una venta mas registrada. Vas por buen camino.";
+}
 function showSaleAnim(s){
   document.getElementById("saleName").textContent=s.a;
   document.getElementById("saleDetail").textContent=s.pl+" — "+(s.vc<1?"Migración (0.5)":"1 venta completa")+" — "+s.tp;
@@ -701,6 +719,7 @@ function showSaleAnim(s){
   const cols=["#0D9488","#F59E0B","#EF4444","#818CF8","#10B981","#3B82F6","#EC4899","#6EE7B7"];
   for(let i=0;i<90;i++){const d=document.createElement("div");d.className="cf";const size=5+Math.random()*8;d.style.cssText=`left:${Math.random()*100}%;top:-10px;background:${cols[i%cols.length]};width:${size}px;height:${size}px;border-radius:${Math.random()>.5?"50%":"3px"};animation:fall ${1.5+Math.random()*2}s ${Math.random()*.5}s linear forwards;`;c.appendChild(d);}
   setTimeout(()=>document.getElementById("saleOverlay").classList.remove("show"),5500);
+  setTimeout(()=>speak(getSaleMsg(s.a,s.pl,s.tp)),700);
 }
 
 // ── FIREBASE ──────────────────────────────────────────────────────
@@ -993,8 +1012,8 @@ function setET(v){esT=v;TYPES.forEach(t=>{document.querySelectorAll("#esTypes .t
 function initBtns(){
   document.getElementById("fPlans").innerHTML=PLANS.map((p,i)=>`<button class="pb" onclick="setFP(${i})">${p.l}</button>`).join("");
   document.getElementById("fTypes").innerHTML=TYPES.map(t=>`<button class="typb" onclick="setFT('${t.v}')">${t.l}</button>`).join("");
-  document.getElementById("esPlans").innerHTML=PLANS.map((p,i)=>`<button class="pb" onclick="setEsP(${i})">${p.l}</button>`).join("");
-  document.getElementById("esTypes").innerHTML=TYPES.map(t=>`<button class="typb" onclick="setEsT('${t.v}')">${t.l}</button>`).join("");
+  document.getElementById("esPlans").innerHTML=PLANS.map((p,i)=>`<button class="pb" onclick="setEP(${i})">${p.l}</button>`).join("");
+  document.getElementById("esTypes").innerHTML=TYPES.map(t=>`<button class="typb" onclick="setET('${t.v}')">${t.l}</button>`).join("");
   refreshBtns();
 }
 function updatePreview(){
