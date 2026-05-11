@@ -1355,7 +1355,7 @@ function init(){
       }
       lastSalesN=Object.keys(nd.sales||{}).length;
     } else {lastSalesN=Object.keys(nd.sales||{}).length;firstLoad=false;}
-    db=nd;showApp();renderAll();
+    db=nd;showApp();renderAll();if(!firstLoad)checkRankChanges();
   },(error)=>{clearTimeout(timeout);showApp();renderAll();});
   firebase.database().ref(".info/connected").on("value",(snap)=>{
     const connected=snap.val();
